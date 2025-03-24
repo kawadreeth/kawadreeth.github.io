@@ -1,198 +1,764 @@
-<!-- index.html -->
-<header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reeth Kawad - Portfolio</title>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y7QNGKQWTZ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-Y7QNGKQWTZ');
+      gtag('config', 'G-X9RZ4C3N2N');
     </script>
-    <link rel="stylesheet" type="text/css" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="script.js"></script>
-    <div class="toggle-container">
-        <label class="switch">
-          <input type="checkbox" id="toggle-dark-mode">
-          <span class="slider round">
-            <span class="slider-icon light-mode-icon">☀</span> <!-- Sun Icon -->
-            <span class="slider-icon dark-mode-icon">🌙</span> <!-- Moon Icon -->
-          </span>
-        </label>
-    </div>
-    
-    <div class="container header-container">
-        <h1><span class="typing-effect">Aashish Kanted</span></h1>
-        <nav>
-            <ul>
-                <li><a href="#about">About</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#experience">Experience</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f8f8;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 20px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        a:hover {
+            color: #0056b3;
+        }
+        
+        /* Header styles */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style-type: none;
+        }
+        
+        nav ul li {
+            margin-left: 30px;
+        }
+        
+        nav ul li a {
+            font-weight: 500;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #007bff;
+            transition: width 0.3s;
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        
+        /* Dark mode toggle */
+        .toggle-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        .slider-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            transition: opacity 0.3s;
+        }
+        
+        .light-mode-icon {
+            left: 8px;
+            opacity: 0;
+        }
+        
+        .dark-mode-icon {
+            right: 8px;
+            opacity: 1;
+        }
+        
+        input:checked + .slider .light-mode-icon {
+            opacity: 1;
+        }
+        
+        input:checked + .slider .dark-mode-icon {
+            opacity: 0;
+        }
+        
+        /* About section */
+        .about-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .profile-image {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        /* Projects section */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .project-entry {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .project-entry:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .project-details {
+            padding: 20px;
+        }
+        
+        .project-link {
+            display: inline-block;
+            margin-top: 15px;
+            margin-right: 10px;
+            padding: 5px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .project-link:hover {
+            background-color: #0056b3;
+            color: #fff;
+        }
+        
+        /* Experience section */
+        .experience-item {
+            display: flex;
+            margin-bottom: 40px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .experience-logo-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .company-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        .company-title {
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .company-name {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .experience-details {
+            flex: 1;
+        }
+        
+        .position-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .position-title {
+            font-weight: 600;
+        }
+        
+        .position-dates {
+            color: #777;
+        }
+        
+        .experience-location {
+            color: #777;
+            margin-bottom: 10px;
+        }
 
-<section id="about">
-    <div class="container about-section">
-        <img src="assets/profile_picture.jpeg" alt="Aashish" class="profile-image">
-        <div class="about-text">
-            <h2>About Me</h2>
-            <p>
-                Welcome! I'm Reeth Kawad, a driven <strong>Mechanical Engineering</strong> student with a minor in AI applications. My passion lies in leading innovative projects that design, <strong>build</strong>, and test cutting-edge machines and products. With a keen focus on <strong>clean tech</strong> and utilizing smart materials for engineering solutions, I am committed to driving positive change in the world. Beyond my technical pursuits, I actively engage in various interests such as playing basketball, and dancing with the USC Trojan Bhangra Club. Explore my website to witness how I propel engineering innovation towards a brighter future.
-            </p>
+        /* Added for bullet points in experience */
+        .experience-details ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .experience-details li {
+            margin-bottom: 5px;
+        }
+        
+        /* Skills section */
+        #skills {
+            background-color: #f1f7ff;
+            padding: 60px 0;
+        }
+        
+        /* Contact section */
+        #contact {
+            background-color: #333;
+            color: #fff;
+            padding: 60px 0;
+        }
+        
+        .contact-link {
+            display: inline-block;
+            margin-right: 20px;
+            color: #007bff;
+        }
+        
+        .contact-link:hover {
+            color: #62b0ff;
+        }
+        
+        /* Typing effect */
+        .typing-effect {
+            border-right: 3px solid #007bff;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3.5s steps(30, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #007bff }
+        }
+        
+        /* Dark mode */
+        body.dark-mode {
+            background-color: #222;
+            color: #f0f0f0;
+        }
+        
+        body.dark-mode header {
+            background-color: #333;
+        }
+        
+        body.dark-mode .project-entry,
+        body.dark-mode .experience-item {
+            background-color: #333;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.dark-mode #skills {
+            background-color: #1a1a1a;
+        }
+        
+        body.dark-mode a {
+            color: #62b0ff;
+        }
+        
+        body.dark-mode a:hover {
+            color: #90caff;
+        }
+        
+        body.dark-mode .project-link {
+            background-color: #0069d9;
+        }
+        
+        body.dark-mode .project-link:hover {
+            background-color: #005cbf;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 20px;
+            }
+            
+            .about-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .experience-item {
+                flex-direction: column;
+            }
+            
+            .experience-logo-title {
+                margin-bottom: 20px;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="toggle-dark-mode">
+                <span class="slider round">
+                    <span class="slider-icon light-mode-icon">☀</span> <!-- Sun Icon -->
+                    <span class="slider-icon dark-mode-icon">🌙</span> <!-- Moon Icon -->
+                </span>
+            </label>
         </div>
-    </div>
-</section>
+        
+        <div class="container header-container">
+            <h1><span class="typing-effect">Reeth Kawad</span></h1>
+            <nav>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#experience">Experience</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-<section id="projects">
-    <div class="container">
-        <h2>My Projects</h2>
-        <ul class="project-list">
-            <li>
-                <strong>Wildfire Defense Water Pump:</strong> Developed an automated water pump system for wildfire protection by integrating a pool-based spray, with manual activation, enhancing fire safety for homes in the Palisades area.
-            </li>
-            <li>
-                <strong>Truss Bridge Optimization:</strong> Modeled and analyzed truss bridge forces using parametric MATLAB simulations, optimizing geometry for structural efficiency and validating assumptions through prototyping and load cell testing.
-            </li>
-            <li>
-                <strong>2-DOF Bluetooth-Controlled Car:</strong> Designed and built a two-degree-of-freedom (2-DOF) car with Bluetooth control, integrating Arduino and motor drivers to enable real-time remote navigation.
-            </li>
-            <li>
-                <strong>Water Rocket Flight Optimization:</strong> Developed a MATLAB simulation to optimize a water rocket’s air-to-water ratio, starting pressure, and parachute surface area, enhancing flight efficiency through mathematical modelling.
-            </li>
-            <li>
-                <strong>Drone CAD & Structural Analysis:</strong> Designed a drone using Siemens NX CAD and conducted structural simulations using FEA and MBD, optimizing aerodynamics and durability for improved flight performance.
-            </li>
-            <li>
-                <strong>Smart Alarm Clock with REM Sleep Monitoring:</strong> Built a smart alarm clock with a pulse meter and Arduino-based DAQ to track BPM, leveraging sleep cycle data to wake users during optimal REM sleep, improving rest efficiency and winning 1st place in the competition.
-            </li>
-            <li>
-                <strong>Walkane – Collapsible Walker-Cane Hybrid:</strong> Engineered a hybrid walker-cane with a collapsible design to improve stability during transitions from stairs to flat ground, enhancing mobility and winning 2nd place in the competition.
-            </li>
-            <li>
-                <strong>Strandbeest Model:</strong> Designed and 3D printed a scaled-down functional model of Theo Jansen’s Strandbeest, demonstrating mechanical linkages and wind-powered locomotion.
-            </li>
-            <li>
-                <strong>Automated Monopoly Board:</strong> Led the electro-mechanical design of a robotic Monopoly board game, collaborating with a team of six to develop a system enabling human vs. bot gameplay.
-            </li>
-            <li>
-                <strong>Brain-Controlled Drone:</strong> Designed and 3D printed a TPU-based adjustable EEG headset, positioning electrodes according to the 10-20 system to enable neural control of a drone using Siemens NX.
-            </li>
-            <li>
-                <strong>Automated Ironing & Folding Machine:</strong> Designing a machine that automates ironing and folding clothes using a steam roller system and a mechanical folding mechanism for shirts and pants, aiming to streamline garment care.
-            </li>
-            <li>
-                <strong>MEMS Device Prototype:</strong> Developing a scaled-up prototype of a MEMS-based accelerometer to demonstrate the principles of microscale motion sensing, utilizing precision fabrication techniques and sensor calibration.
-            </li>
-            <li>
-                <strong>Vertical Axis Wind Turbine:</strong> Engineering a vertical axis wind turbine to enhance energy efficiency in low-wind environments, focusing on optimizing blade design and mechanical power conversion.
-            </li>
-            <li>
-                <strong>Wind Turbine Blade Optimization:</strong> Designed, analyzed, and optimized a wind turbine blade of length 5.7m using Solidworks and ANSYS Mechanical as a research project for the certification department to identify different load cases.
-            </li>
-            <li>
-                <strong>Robotic Frame</strong>
-            </li>
-            <li>
-                <strong>Chassis Optimization:</strong> Optimized chassis weight by 30%, while maintaining structural integrity, by conducting 1D & 3D structural analysis in ANSYS Mechanical and Siemens NX.
-            </li>
-        </ul>
-    </div>
-</section>
+    <section id="about">
+        <div class="container about-section">
+            <!-- Replace with your actual profile image path -->
+            <img src="assets/profile_picture.png" alt="Reeth" class="profile-image">
+            <div class="about-text">
+                <h2>About Me</h2>
+                <p>Welcome! I'm Reeth Kawad, a driven <strong>Mechanical Engineering</strong> student with a 
+                minor in AI applications. My passion lies in leading innovative projects that design, <strong>build</strong>, and test
+                cutting-edge machines and products. With a keen focus on <strong>clean tech</strong> and utilizing smart materials for
+                engineering solutions, I am committed to driving positive change in the world. Beyond my technical pursuits,
+                I actively engage in various interests such as playing basketball, and dancing with 
+                the USC Trojan Bhangra Club. Explore my website to witness how I propel engineering innovation 
+                towards a brighter future.</p>
+            </div>
+        </div>
+    </section>
 
-<section id="experience">
-    <div class="container">
-        <h2>Experience</h2>
-        <div class="experience-item">
-            <div class="experience-logo-title">
-                <img src="assets/crystal ball.png" alt="Company Logo" class="company-logo">
-                <div class="company-title">
-                    <h3 class="company-name">Crystal Ball</h3>
+    <section id="projects">
+        <div class="container">
+            <h2>My Projects</h2>
+            <div class="project-grid">
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="Wildfire Defense Water Pump" class="project-image">
+                    <div class="project-details">
+                        <h3>Wildfire Defense Water Pump</h3>
+                        <p>Developed an automated water pump system for wildfire protection by integrating a pool-based spray, with manual activation, enhancing fire safety for homes in the Palisades area.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="experience-details" style="margin-left: 20px;">
-                <div class="position-details">
-                    <p class="position-title">Embedded Systems Designer</p>
-                    <p class="position-dates">May 2024 - Jul 2024</p>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/bridge.png" alt="Truss Bridge Optimization" class="project-image">
+                    <div class="project-details">
+                        <h3>Truss Bridge Optimization</h3>
+                        <p>Modeled and analyzed truss bridge forces using parametric MATLAB simulations, optimizing geometry for structural efficiency and validating assumptions through prototyping and load cell testing.</p>
+                    </div>
                 </div>
-                <p class="experience-location">Hyderabad, India</p>
-                <p class="experience-description">Researched and designed a custom PPK-RTK capable GPS module. The module combined SoCs for Wi-Fi, eMMC, ublox GNSS, and STM32. Also wrote complete firmware and libraries to interface these components.</p>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="2-DOF Bluetooth-Controlled Car" class="project-image">
+                    <div class="project-details">
+                        <h3>2-DOF Bluetooth-Controlled Car</h3>
+                        <p>Designed and built a two-degree-of-freedom (2-DOF) car with Bluetooth control, integrating Arduino, and motor drivers to enable real-time remote navigation.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="Water Rocket Flight Optimization" class="project-image">
+                    <div class="project-details">
+                        <h3>Water Rocket Flight Optimization</h3>
+                        <p>Developed a MATLAB simulation to optimize a water rocket's air-to-water ratio, starting pressure, and parachute surface area, enhancing flight efficiency through mathematical modelling.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="Drone CAD & Structural Analysis" class="project-image">
+                    <div class="project-details">
+                        <h3>Drone CAD & Structural Analysis</h3>
+                        <p>Designed a drone using Siemens NX CAD and conducted structural simulations using FEA and MBD, optimizing aerodynamics and durability for improved flight performance.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="Smart Alarm Clock" class="project-image">
+                    <div class="project-details">
+                        <h3>Smart Alarm Clock with REM Sleep Monitoring</h3>
+                        <p>Built a smart alarm clock with a pulse meter and Arduino-based DAQ to track BPM, leveraging sleep cycle data to wake users during optimal REM sleep, improving rest efficiency and winning 1st place in the competition.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/walkane_real.png" alt="Walkane" class="project-image">
+                    <div class="project-details">
+                        <h3>Walkane – Collapsible Walker-Cane Hybrid</h3>
+                        <p>Engineered a hybrid walker-cane with a collapsible design to improve stability during transitions from stairs to flat ground, enhancing mobility and winning 2nd place in the competition.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/strandbeest.png" alt="Strandbeest Model" class="project-image">
+                    <div class="project-details">
+                        <h3>Strandbeest Model</h3>
+                        <p>Designed and 3D printed a scaled-down functional model of Theo Jansen's Strandbeest, demonstrating mechanical linkages and wind-powered locomotion.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/monopoly.png" alt="Automated Monopoly Board" class="project-image">
+                    <div class="project-details">
+                        <h3>Automated Monopoly Board</h3>
+                        <p>Led the electro-mechanical design of a robotic Monopoly boardgame, collaborating with a team of six to develop a system enabling human vs. bot gameplay.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/bcd.webp" alt="Brain-Controlled Drone" class="project-image">
+                    <div class="project-details">
+                        <h3>Brain-Controlled Drone</h3>
+                        <p>Designed and 3D printed a TPU-based adjustable EEG headset, positioning electrodes according to the 10-20 system to enable neural control of a drone using Siemens NX.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="MEMS Device Prototype" class="project-image">
+                    <div class="project-details">
+                        <h3>MEMS Device Prototype</h3>
+                        <p>Developing a scaled-up prototype of a MEMS-based accelerometer to demonstrate the principles of microscale motion sensing, utilizing precision fabrication techniques and sensor calibration.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="Vertical Axis Wind Turbine" class="project-image">
+                    <div class="project-details">
+                        <h3>Vertical Axis Wind Turbine</h3>
+                        <p>Engineering a vertical axis wind turbine to enhance energy efficiency in low-wind environments, focusing on optimizing blade design and mechanical power conversion.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/wind blade.png" alt="Wind Turbine Blade Design" class="project-image">
+                    <div class="project-details">
+                        <h3>Wind Turbine Blade Design</h3>
+                        <p>Designed, analyzed, and optimized a wind turbine blade of length 5.7m, using Solidworks and ANSYS Mechanical, as a research project for the certification department to identify different load cases.</p>
+                    </div>
+                </div>
+                
+                <div class="project-entry">
+                    <!-- Replace with your actual project image path -->
+                    <img src="assets/alarm.png" alt="Robotic Frame" class="project-image">
+                    <div class="project-details">
+                        <h3>Robotic Frame</h3>
+                        <p>Optimized chassis weight by 30%, while maintaining structural integrity, by conducting 1D & 3D structural analysis in ANSYS Mechanical and Siemens NX.</p>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="experience-item">
-            <div class="experience-logo-title">
-                <img src="assets/kratosbitsgoa_logo.jpeg" alt="Company Logo" class="company-logo">
-                <div class="company-title">
-                    <h3 class="company-name">Project Kratos</h3>
-                </div>
-            </div>
-            <div class="experience-details">
-                <div class="position-details">
-                    <p class="position-title">Robotic Arm Lead</p>
-                    <p class="position-dates">May 2023 - Present</p>
-                </div>
-                <p class="experience-description">• Managed a team to design and improve robotic arm components through research and close collaboration with other subsystems.
-                    </br>• Led the manufacturing, fabrication, and integration of essential rover components.</p>
-                <div class="position-details">
-                    <p class="position-title">Core Member</p>
-                    <p class="position-dates">Sep 2022 - May 2023</p>
-                </div>
-            </div>
-        </div>
-        <div class="experience-item">
-            <div class="experience-logo-title">
-                <img src="assets/sandbox_innovation_lab_logo.jpeg" alt="Company Logo" class="company-logo">
-                <div class="company-title">
-                    <h3 class="company-name">Sandbox Innovation Lab</h3>
-                </div>
-            </div>
-            <div class="experience-details">
-                <div class="position-details">
-                    <p class="position-title">Inventory Head</p>
-                    <p class="position-dates">Aug 2023 - Aug 2024</p>
-                </div>
-                <p class="experience-description">Head of committee in Sandbox Lab, BITS Goa's innovation incubation center. 
-                </br>Oversaw inventory management and facilitated innovative student projects by providing resources and guidance.</p>
-                <div class="position-details">
-                    <p class="position-title">Committee Member</p>
-                    <p class="position-dates">Jan 2023 - Aug 2023</p>
-                </div>
-            </div>
-        </div>
-        <div class="experience-item">
-            <div class="experience-logo-title">
-                <img src="assets/ERC_logo.jpeg" alt="Company Logo" class="company-logo">
-                <div class="company-title">
-                    <h3 class="company-name">Electronics and Robotics Club</h3>
-                </div>
-            </div>
-            <div class="experience-details">
-                <div class="position-details">
-                    <p class="position-title">Core Member</p>
-                    <p class="position-dates">May 2022 - Present</p>
-                </div>
-                <p class="experience-description">Worked on the control system of an autonomous holonomic robot, focusing on improving the precision and accuracy of navigation and interaction.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<section id="skills">
-    <div class="container">
-        <h2>Skills & Relevant Courses</h2>
-        <p><strong>Technical Skills:</strong> Robotics, SLAM, Control Systems, Computer Vision, Embedded Systems, Motion Planning, Path Planning, Autonomous Systems, etc.</p>
-        <p><strong>Relevant Courses:</strong> Control Systems, Embedded Systems, Microelectronics, Microprocessors, Analog and Digital Design, Signals and Systems, Power Electronics, Classical Mechanics, Quantum Information and Computing.</p>
-    </div>
-</section>
+    <section id="experience">
+        <div class="container">
+            <h2>Experience</h2>
+            
+            <div class="experience-item">
+                <div class="experience-logo-title">
+                    <!-- Replace with your actual company logo path -->
+                    <img src="path/to/your/makerspace-logo.jpg" alt="Baum Family Makerspace Logo" class="company-logo">
+                    <div class="company-title">
+                        <h3 class="company-name">Baum Family Makerspace</h3>
+                    </div>
+                </div>
+                <div class="experience-details" style="margin-left: 20px;">
+                    <div class="position-details">
+                        <p class="position-title">Student Worker</p>
+                        <p class="position-dates">September 2023 - Present</p>
+                    </div>
+                    <p class="experience-location">Los Angeles, CA</p>
+                    <ul>
+                        <li>Program and operate Haas CNC, ProtoTRAK, Omax waterjet, and laser cutter to manufacture GD&T precision components, interpret technical drawings, and optimize toolpaths in MasterCam</li>
+                        <li>Fabricated 100+ 3D printed prototypes (PLA, resin, carbon fiber), and supporting 12+ design teams and 80+ research labs to design for manufacturing (DFM), like side wing airfoil elements of the Formula SAE car</li>
+                    </ul>
+                </div>
+            </div>
 
-<section id="contact">
-    <div class="container">
-        <h2>Contact</h2>
-        <p>Email: <a href="mailto:aakanted@gmail.com" class="contact-link" target="_blank">aakanted@gmail.com</a></p>
-        <!-- Add links to your professional profiles -->
-        <a href="https://www.linkedin.com/in/aashish-kanted-7a3707225/" class="contact-link" target="_blank">LinkedIn</a>
-        <a href="https://github.com/AashishKanted" class="contact-link" target="_blank">Github</a>
-    </div>
-</section>
+            <div class="experience-item">
+                <div class="experience-logo-title">
+                    <!-- Replace with your actual company logo path -->
+                    <img src="path/to/your/tutr-hyperloop-logo.jpg" alt="TuTr Hyperloop Logo" class="company-logo">
+                    <div class="company-title">
+                        <h3 class="company-name">TuTr Hyperloop</h3>
+                    </div>
+                </div>
+                <div class="experience-details" style="margin-left: 20px;">
+                    <div class="position-details">
+                        <p class="position-title">Mechanical Engineer Intern</p>
+                        <p class="position-dates">May 2023 - August 2023</p>
+                    </div>
+                    <p class="experience-location">Los Angeles, CA</p>
+                    <ul>
+                        <li>Optimized chassis weight by 30%, while maintaining structural integrity, by conducting 1D & 3D structural analysis in ANSYS Mechanical and Solidworks</li>
+                        <li>Developed & simulated an air gap control system (±6mm tolerance) for a linear induction motor, using MATLAB Simulink</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="experience-item">
+                <div class="experience-logo-title">
+                    <!-- Replace with your actual company logo path -->
+                    <img src="path/to/your/robotic-lab-logo.jpg" alt="Robotic Locomotion and Dynamic Lab Logo" class="company-logo">
+                    <div class="company-title">
+                        <h3 class="company-name">Robotic Locomotion and Dynamic Lab USC</h3>
+                    </div>
+                </div>
+                <div class="experience-details" style="margin-left: 20px;">
+                    <div class="position-details">
+                        <p class="position-title">Mechanical Design Engineer</p>
+                        <p class="position-dates">January 2023 - May 2023</p>
+                    </div>
+                    <p class="experience-location">Los Angeles, CA</p>
+                    <ul>
+                        <li>Devised a 4-link leg mechanism, including a custom holding frame, for a force-sensing direct drive quadrupedal robot honed for complex terrain navigation, using Solidworks</li>
+                        <li>Built a test stand for motor feedback by deploying linear actuators and stepper motors for terrain adaptability research</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="experience-item">
+                <div class="experience-logo-title">
+                    <!-- Replace with your actual company logo path -->
+                    <img src="path/to/your/niwe-logo.jpg" alt="National Institute of Wind Energy Logo" class="company-logo">
+                    <div class="company-title">
+                        <h3 class="company-name">National Institute of Wind Energy (NIWE)</h3>
+                    </div>
+                </div>
+                <div class="experience-details" style="margin-left: 20px;">
+                    <div class="position-details">
+                        <p class="position-title">Wind Blade Intern</p>
+                        <p class="position-dates">June 2022 - August 2022</p>
+                    </div>
+                    <p class="experience-location">Chennai, India</p>
+                    <ul>
+                        <li>Designed, analyzed, and optimized a wind turbine blade of length 5.7m, using Solidworks and ANSYS Mechanical, as a research project for the certification department to identify different load cases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills">
+        <div class="container">
+            <h2>Skills & Relevant Courses</h2>
+            <p><strong>Technical Skills:</strong> CAD/CAM (SolidWorks, Siemens NX), FEA Analysis (ANSYS), MATLAB, Arduino, 3D Printing, Mechanical Design, Control Systems</p>
+            <p><strong>Relevant Courses:</strong> Mechanics of Materials, Thermodynamics, Fluid Mechanics, Machine Design, Control Systems, Finite Element Analysis, AI Applications in Engineering</p>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <h2>Contact</h2>
+            <p>Email: <a href="mailto:rkawad@usc.edu" class="contact-link" target="_blank">rkawad@usc.edu</a></p>
+            <a href="https://www.linkedin.com/" class="contact-link" target="_blank">LinkedIn</a>
+            <a href="https://github.com/" class="contact-link" target="_blank">Github</a>
+        </div>
+    </section>
+
+    <script>
+        // Dark mode toggle
+        const toggleSwitch = document.getElementById('toggle-dark-mode');
+        
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+        
+        // Check for saved dark mode preference
+        const darkMode = localStorage.getItem('darkMode');
+        if (darkMode === 'enabled') {
+            toggleSwitch.checked = true;
+            document.body.classList.add('dark-mode');
+        }
+        
+        // Typing effect animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const typingElement = document.querySelector('.typing-effect');
+            const text = typingElement.textContent;
+            typingElement.textContent = '';
+            
+            function typeWriter(text, i, fnCallback) {
+                if (i < text.length) {
+                    typingElement.textContent = text.substring(0, i + 1);
+                    
+                    setTimeout(function() {
+                        typeWriter(text, i + 1, fnCallback);
+                    }, 100);
+                } else if (typeof fnCallback == 'function') {
+                    setTimeout(fnCallback, 700);
+                }
+            }
+            
+            typeWriter(text, 0, function() {
+                typingElement.style.borderRight = 'none';
+            });
+        });
+        
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -21,11 +21,11 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
+        /* Dark mode styling by default */
         body {
             line-height: 1.6;
-            color: #333;
-            background-color: #f8f8f8;
-            transition: background-color 0.3s, color 0.3s;
+            color: #f0f0f0;
+            background-color: #222;
         }
         
         .container {
@@ -44,23 +44,22 @@
         }
         
         a {
-            color: #007bff;
+            color: #003366; /* Changed to navy blue */
             text-decoration: none;
             transition: color 0.3s;
         }
         
         a:hover {
-            color: #0056b3;
+            color: #004d99; /* Darker navy blue for hover */
         }
         
         /* Header styles */
         header {
-            background-color: #fff;
+            background-color: #333;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
-            transition: background-color 0.3s;
         }
         
         .header-container {
@@ -92,100 +91,12 @@
             left: 0;
             width: 0;
             height: 2px;
-            background-color: #007bff;
+            background-color: #003366; /* Changed to navy blue */
             transition: width 0.3s;
         }
         
         nav ul li a:hover::after {
             width: 100%;
-        }
-        
-        /* Dark mode toggle */
-        .toggle-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-        }
-        
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        
-        input:focus + .slider {
-            box-shadow: 0 0 1px #2196F3;
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        
-        .slider.round {
-            border-radius: 34px;
-        }
-        
-        .slider.round:before {
-            border-radius: 50%;
-        }
-        
-        .slider-icon {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            transition: opacity 0.3s;
-        }
-        
-        .light-mode-icon {
-            left: 8px;
-            opacity: 0;
-        }
-        
-        .dark-mode-icon {
-            right: 8px;
-            opacity: 1;
-        }
-        
-        input:checked + .slider .light-mode-icon {
-            opacity: 1;
-        }
-        
-        input:checked + .slider .dark-mode-icon {
-            opacity: 0;
         }
         
         /* About section */
@@ -215,10 +126,10 @@
         }
         
         .project-entry {
-            background-color: #fff;
+            background-color: #333;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s, box-shadow 0.3s;
         }
         
@@ -242,14 +153,14 @@
             margin-top: 15px;
             margin-right: 10px;
             padding: 5px 15px;
-            background-color: #007bff;
+            background-color: #003366; /* Changed to navy blue */
             color: #fff;
             border-radius: 5px;
             transition: background-color 0.3s;
         }
         
         .project-link:hover {
-            background-color: #0056b3;
+            background-color: #004d99; /* Darker navy blue for hover */
             color: #fff;
         }
         
@@ -257,10 +168,10 @@
         .experience-item {
             display: flex;
             margin-bottom: 40px;
-            background-color: #fff;
+            background-color: #333;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .experience-logo-title {
@@ -271,8 +182,8 @@
         }
         
         .company-logo {
-            width: 80px;
-            height: 80px;
+            width: 120px; /* Increased from 80px */
+            height: 120px; /* Increased from 80px */
             object-fit: cover;
             border-radius: 10px;
         }
@@ -302,11 +213,11 @@
         }
         
         .position-dates {
-            color: #777;
+            color: #ccc;
         }
         
         .experience-location {
-            color: #777;
+            color: #ccc;
             margin-bottom: 10px;
         }
 
@@ -322,7 +233,7 @@
         
         /* Skills section */
         #skills {
-            background-color: #f1f7ff;
+            background-color: #1a1a1a;
             padding: 60px 0;
         }
         
@@ -336,16 +247,16 @@
         .contact-link {
             display: inline-block;
             margin-right: 20px;
-            color: #007bff;
+            color: #003366; /* Changed to navy blue */
         }
         
         .contact-link:hover {
-            color: #62b0ff;
+            color: #004d99; /* Darker navy blue for hover */
         }
         
         /* Typing effect */
         .typing-effect {
-            border-right: 3px solid #007bff;
+            border-right: 3px solid #003366; /* Changed to navy blue */
             white-space: nowrap;
             overflow: hidden;
             animation: typing 3.5s steps(30, end), blink-caret 0.75s step-end infinite;
@@ -358,43 +269,19 @@
         
         @keyframes blink-caret {
             from, to { border-color: transparent }
-            50% { border-color: #007bff }
+            50% { border-color: #003366 } /* Changed to navy blue */
         }
         
-        /* Dark mode */
-        body.dark-mode {
-            background-color: #222;
-            color: #f0f0f0;
+        /* Section heading styles */
+        .section-heading {
+            font-size: 28px;
+            margin-bottom: 30px;
         }
         
-        body.dark-mode header {
-            background-color: #333;
-        }
-        
-        body.dark-mode .project-entry,
-        body.dark-mode .experience-item {
-            background-color: #333;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        body.dark-mode #skills {
-            background-color: #1a1a1a;
-        }
-        
-        body.dark-mode a {
-            color: #62b0ff;
-        }
-        
-        body.dark-mode a:hover {
-            color: #90caff;
-        }
-        
-        body.dark-mode .project-link {
-            background-color: #0069d9;
-        }
-        
-        body.dark-mode .project-link:hover {
-            background-color: #005cbf;
+        .sub-heading {
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
         }
         
         /* Responsive styles */
@@ -426,16 +313,6 @@
 </head>
 <body>
     <header>
-        <div class="toggle-container">
-            <label class="switch">
-                <input type="checkbox" id="toggle-dark-mode">
-                <span class="slider round">
-                    <span class="slider-icon light-mode-icon">☀</span> <!-- Sun Icon -->
-                    <span class="slider-icon dark-mode-icon">🌙</span> <!-- Moon Icon -->
-                </span>
-            </label>
-        </div>
-        
         <div class="container header-container">
             <h1><span class="typing-effect">Reeth Kawad</span></h1>
             <nav>
@@ -468,7 +345,7 @@
 
     <section id="projects">
         <div class="container">
-            <h2>My Projects</h2>
+            <h2 class="section-heading">My Projects</h2>
             <div class="project-grid">
                 <div class="project-entry">
                     <!-- Replace with your actual project image path -->
@@ -555,12 +432,14 @@
                         <p>Designed and built a two-degree-of-freedom (2-DOF) car with Bluetooth control, integrating Arduino, and motor drivers to enable real-time remote navigation.</p>
                     </div>
                 </div>
-                
+            </div>
+            
+            <h2 class="sub-heading">Ongoing Projects</h2>
+            <div class="project-grid">
                 <div class="project-entry">
                     <!-- Replace with your actual project image path -->
                     <img src="assets/vawt.jpg" alt="Vertical Axis Wind Turbine" class="project-image">
                     <div class="project-details">
-                        <h2>Ongoing Projects</h2>
                         <h3>Vertical Axis Wind Turbine</h3>
                         <p>Engineering a vertical axis wind turbine to enhance energy efficiency in low-wind environments, focusing on optimizing blade design and mechanical power conversion.</p>
                     </div>
@@ -581,14 +460,13 @@
                         <p>Designed and 3D printed a TPU-based adjustable EEG headset, positioning electrodes according to the 10-20 system to enable neural control of a drone using Siemens NX.</p>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
     <section id="experience">
         <div class="container">
-            <h2>Experience</h2>
+            <h2 class="section-heading">Experience</h2>
             
             <div class="experience-item">
                 <div class="experience-logo-title">
@@ -679,8 +557,8 @@
 
     <section id="skills">
         <div class="container">
-            <h2>Skills & Relevant Courses</h2>
-            <p><strong>CAD & Simulation:</strong> CAD & Simulation: Solidworks, SolidWorks, Fusion 360, MasterCam, ANSYS (Mechanical, Fluent), TotalSim</p>
+            <h2 class="section-heading">Skills & Relevant Courses</h2>
+            <p><strong>CAD & Simulation:</strong> SolidWorks, Fusion 360, MasterCam, ANSYS (Mechanical, Fluent), TotalSim</p>
             <p><strong>Manufacturing & Prototyping:</strong> CNC Milling, Lathing, 3D Printing, Composite Layup, FEA, Machining</p>
             <p><strong>Programming:</strong> Python, MATLAB/Simulink, LabVIEW, Arduino
             <p><strong>Relevant Courses:</strong> Dynamic Systems (MATLAB), Heat Transfer, Microelectromechanical Systems (MEMS), Accelerated Programming in Python, Mechanics of Materials and Structures, Computer-Aided Engineering, Measurement and Instrumentation</p>
@@ -689,7 +567,7 @@
 
     <section id="contact">
         <div class="container">
-            <h2>Contact</h2>
+            <h2 class="section-heading">Contact</h2>
             <p>Email: <a href="mailto:rkawad@usc.edu" class="contact-link" target="_blank">rkawad@usc.edu</a></p>
             <a href="https://www.linkedin.com/in/reethkawad/" class="contact-link" target="_blank">LinkedIn</a>
             <a href="https://github.com/kawadreeth" class="contact-link" target="_blank">Github</a>
@@ -697,26 +575,6 @@
     </section>
 
     <script>
-        // Dark mode toggle
-        const toggleSwitch = document.getElementById('toggle-dark-mode');
-        
-        toggleSwitch.addEventListener('change', function() {
-            if (this.checked) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('darkMode', 'enabled');
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('darkMode', 'disabled');
-            }
-        });
-        
-        // Check for saved dark mode preference
-        const darkMode = localStorage.getItem('darkMode');
-        if (darkMode === 'enabled') {
-            toggleSwitch.checked = true;
-            document.body.classList.add('dark-mode');
-        }
-        
         // Typing effect animation
         document.addEventListener('DOMContentLoaded', function() {
             const typingElement = document.querySelector('.typing-effect');

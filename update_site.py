@@ -24,6 +24,46 @@ try:
 except ImportError:
     sys.exit("Run: pip install python-docx")
 
+from dataclasses import dataclass, field
+from typing import List
+
+
+@dataclass
+class SubProject:
+    title: str
+    tools: List[str]
+    situation: str
+    task: str
+    action: List[str]
+    result: List[str]
+
+
+@dataclass
+class Experience:
+    company: str
+    role: str
+    dates: str
+    location: str
+    subprojects: List[SubProject]
+
+
+@dataclass
+class Project:
+    title: str
+    tags: List[str]
+    situation: str
+    task: str
+    action: List[str]
+    result: List[str]
+
+
+@dataclass
+class Token:
+    type: str
+    text: str = ""
+    situation: str = ""
+    task: str = ""
+
 DOCX_PATH = pathlib.Path(
     r"C:\Users\reeth\OneDrive - University of Southern California"
     r"\website\Reeth_Kawad_Master_Career_Doc_v2 (1).docx"

@@ -92,6 +92,48 @@ def parse_star_table(table):
     return situation, task
 
 
+def _classify_paragraph(text):
+    if not text:
+        return None
+    if any(text.strip() == m or text.startswith(m) for m in _SECTION_END_MARKERS):
+        return "SECTION_END"
+    if any(company in text for company in KNOWN_COMPANIES):
+        return "COMPANY_HEADER"
+    if re.match(r"\w+ \d{4}\s*[–\-]", text):
+        return "DATE_LINE"
+    if re.match(r"Project \d+:", text):
+        return "SUBPROJECT_HEADER"
+    if any(text.startswith(prefix) for prefix in PROJECT_TITLE_SLUGS):
+        return "STANDALONE_TITLE"
+    if "·" in text or "\xb7" in text:
+        return "TOOLS_LINE"
+    if text.strip() == "ACTION":
+        return "ACTION_HEADER"
+    if text.strip() == "RESULT":
+        return "RESULT_HEADER"
+    if _EXPERIENCE_HEADER_RE.search(text):
+        return "UNKNOWN_HEADER"
+    return "BULLET_ITEM"
+
+
+def tokenize_doc(doc):
+    """Walk doc body in element order and return a flat list of Tokens."""
+    tokens = []
+    for kind, elem in iter_body_elements(doc):
+        if kind == "paragraph":
+            text = elem.text.strip()
+            if not text:
+                continue
+            tok_type = _classify_paragraph(text)
+            if tok_type:
+                tokens.append(Token(type=tok_type, text=text))
+        elif kind == "table":
+            situation, task = parse_star_table(elem)
+            if situation is not None:
+                tokens.append(Token(type="STAR_TABLE", situation=situation, task=task))
+    return tokens
+
+
 DOCX_PATH = pathlib.Path(
     r"C:\Users\reeth\OneDrive - University of Southern California"
     r"\website\Reeth_Kawad_Master_Career_Doc_v2 (1).docx"
@@ -115,6 +157,37 @@ SLUG_MAP = {
     "TuTr Hyperloop": "tutr",
     "National Institute of Wind Energy": "niwe",
 }
+
+# Maps doc standalone-project title prefix → existing slug (None = new entry)
+PROJECT_TITLE_SLUGS = {
+    "Adaptive Pitch Control": "vawt",
+    "Turbine Airfoil CFD": None,
+    "Honeycomb Flow Straightener": "windtunnel",
+    "Smart Alarm Clock": "alarm",
+    "Walkane": "walkane",
+    "FSAE Projects": "fsae",
+    "8 DoF Robotic Hand": "dexhand",
+    "Truss Bridge": "bridge",
+    "2-DOF Bluetooth": "kothcar",
+    "Water Rocket": "waterrocket",
+    "Drone CAD": "drone",
+    "Automated Monopoly": "monopoly",
+    "FireWarden": "firewarden",
+    "USC Collegiate Wind Competition": "cwc",
+}
+
+# Lines matching this pattern but NOT in KNOWN_COMPANIES end the current experience
+_EXPERIENCE_HEADER_RE = re.compile(
+    r".+[—–].+\b(Intern|Engineer|Lead|Founder|Co-Founder|CTO|Manager|Director|Machinist|Researcher)\b"
+)
+
+_SECTION_END_MARKERS = [
+    "Other Projects (Summary)",
+    "LINKEDIN MESSAGE TEMPLATES",
+    "HOW TO USE THIS PAGE",
+    "CORE SKILLS MATRIX",
+    "Short Bio",
+]
 
 SKILLS_CATEGORY_ORDER = [
     ("Controls & Firmware", "controls"),

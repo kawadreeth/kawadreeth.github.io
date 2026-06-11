@@ -78,3 +78,46 @@ def test_parse_star_table_wrong_labels_returns_none():
     situation, task = parse_star_table(table)
     assert situation is None
     assert task is None
+
+from update_site import tokenize_doc, KNOWN_COMPANIES
+
+def test_tokenize_company_header():
+    doc = Document()
+    doc.add_paragraph("GrayMatter Robotics — Robotics Systems & Applications Intern")
+    tokens = tokenize_doc(doc)
+    assert tokens[0].type == "COMPANY_HEADER"
+    assert "GrayMatter" in tokens[0].text
+
+def test_tokenize_date_line():
+    doc = Document()
+    doc.add_paragraph("Jan 2026 – May 2026  |  surface finishing  |  Torrance, CA")
+    tokens = tokenize_doc(doc)
+    assert tokens[0].type == "DATE_LINE"
+
+def test_tokenize_tools_line():
+    doc = Document()
+    doc.add_paragraph("SolidWorks \xb7 MeshLab \xb7 ROS2 \xb7 Python")
+    tokens = tokenize_doc(doc)
+    assert tokens[0].type == "TOOLS_LINE"
+
+def test_tokenize_star_table():
+    doc = Document()
+    table = doc.add_table(rows=2, cols=2)
+    table.rows[0].cells[0].text = "S"
+    table.rows[0].cells[1].text = "SITUATION The problem."
+    table.rows[1].cells[0].text = "T"
+    table.rows[1].cells[1].text = "TASK The work."
+    tokens = tokenize_doc(doc)
+    star_tokens = [t for t in tokens if t.type == "STAR_TABLE"]
+    assert len(star_tokens) == 1
+    assert star_tokens[0].situation == "The problem."
+    assert star_tokens[0].task == "The work."
+
+def test_tokenize_action_result_headers():
+    doc = Document()
+    doc.add_paragraph("ACTION")
+    doc.add_paragraph("RESULT")
+    tokens = tokenize_doc(doc)
+    types = [t.type for t in tokens]
+    assert "ACTION_HEADER" in types
+    assert "RESULT_HEADER" in types

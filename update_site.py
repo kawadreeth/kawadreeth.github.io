@@ -240,6 +240,51 @@ def parse_experiences(tokens):
     return experiences
 
 
+def parse_projects(tokens):
+    """Parse standalone Project objects from a token list."""
+    projects = []
+    current_proj = None
+    state = "IDLE"  # IDLE, IN_PROJ, IN_ACTION, IN_RESULT
+
+    for tok in tokens:
+        if tok.type == "SECTION_END":
+            if current_proj is not None:
+                projects.append(current_proj)
+            break
+
+        if tok.type == "STANDALONE_TITLE":
+            if current_proj is not None:
+                projects.append(current_proj)
+            # Strip award emoji/text: everything after first trophy or medal emoji
+            title = re.sub(r"\s*[\U0001f3c6\U0001f947-\U0001f949].*$", "", tok.text).strip()
+            current_proj = Project(title=title, tags=[], situation="", task="", action=[], result=[])
+            state = "IN_PROJ"
+            continue
+
+        if current_proj is None:
+            continue
+
+        if tok.type == "TOOLS_LINE":
+            current_proj.tags = _parse_tools(tok.text)
+        elif tok.type == "STAR_TABLE":
+            current_proj.situation = tok.situation
+            current_proj.task = tok.task
+        elif tok.type == "ACTION_HEADER":
+            state = "IN_ACTION"
+        elif tok.type == "RESULT_HEADER":
+            state = "IN_RESULT"
+        elif tok.type == "BULLET_ITEM" and state == "IN_ACTION":
+            current_proj.action.append(tok.text)
+        elif tok.type == "BULLET_ITEM" and state == "IN_RESULT":
+            current_proj.result.append(tok.text)
+
+    else:
+        if current_proj is not None:
+            projects.append(current_proj)
+
+    return projects
+
+
 DOCX_PATH = pathlib.Path(
     r"C:\Users\reeth\OneDrive - University of Southern California"
     r"\website\Reeth_Kawad_Master_Career_Doc_v2 (1).docx"

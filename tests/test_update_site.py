@@ -195,3 +195,53 @@ def test_parse_two_experiences():
     )
     exps = parse_experiences(tokens2)
     assert len(exps) == 2
+
+from update_site import parse_projects
+
+def _make_project_tokens():
+    return [
+        Token(type="STANDALONE_TITLE", text="Adaptive Pitch Control — H-Type VAWT"),
+        Token(type="TOOLS_LINE", text="Bayesian Optimisation · PID Control · Wind Tunnel"),
+        Token(type="STAR_TABLE", situation="VAWTs run below efficiency.", task="Build adaptive pitch."),
+        Token(type="ACTION_HEADER"),
+        Token(type="BULLET_ITEM", text="Fabricated the VAWT."),
+        Token(type="BULLET_ITEM", text="Implemented Bayesian Opt."),
+        Token(type="RESULT_HEADER"),
+        Token(type="BULLET_ITEM", text="8% efficiency improvement."),
+        Token(type="STANDALONE_TITLE", text="Honeycomb Flow Straightener Wind Tunnel Study"),
+        Token(type="TOOLS_LINE", text="Pitot Tube · Fabrication"),
+        Token(type="STAR_TABLE", situation="Turbulence problem.", task="Measure it."),
+        Token(type="ACTION_HEADER"),
+        Token(type="BULLET_ITEM", text="Built the tunnel."),
+        Token(type="RESULT_HEADER"),
+        Token(type="BULLET_ITEM", text="53% turbulence reduction."),
+        Token(type="SECTION_END", text="Other Projects (Summary)"),
+    ]
+
+def test_parse_projects_count():
+    tokens = _make_project_tokens()
+    projects = parse_projects(tokens)
+    assert len(projects) == 2
+
+def test_parse_project_fields():
+    tokens = _make_project_tokens()
+    projects = parse_projects(tokens)
+    p = projects[0]
+    assert p.situation == "VAWTs run below efficiency."
+    assert p.task == "Build adaptive pitch."
+    assert p.action == ["Fabricated the VAWT.", "Implemented Bayesian Opt."]
+    assert p.result == ["8% efficiency improvement."]
+    assert "Bayesian Optimisation" in p.tags
+
+def test_parse_project_strips_award_emoji():
+    tokens = [
+        Token(type="STANDALONE_TITLE", text="Smart Alarm Clock  \U0001f3c6 1st Place IEEE Hack-IoT"),
+        Token(type="TOOLS_LINE", text="Arduino · Sensors"),
+        Token(type="STAR_TABLE", situation="s", task="t"),
+        Token(type="ACTION_HEADER"),
+        Token(type="BULLET_ITEM", text="Built it."),
+        Token(type="RESULT_HEADER"),
+        Token(type="BULLET_ITEM", text="Won."),
+    ]
+    projects = parse_projects(tokens)
+    assert projects[0].title == "Smart Alarm Clock"

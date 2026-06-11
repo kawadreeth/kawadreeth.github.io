@@ -134,6 +134,112 @@ def tokenize_doc(doc):
     return tokens
 
 
+def _parse_company_header(text):
+    """Split 'Company Name — Role Title' into (company, role)."""
+    parts = re.split(r"\s*[—–]\s*", text, maxsplit=1)
+    if len(parts) == 2:
+        return parts[0].strip(), parts[1].strip()
+    return text.strip(), ""
+
+
+def _parse_date_line(text):
+    """Split 'Jun 2024 – Jul 2024  |  description  |  Location, ST' into (dates, location)."""
+    parts = [p.strip() for p in text.split("|")]
+    dates = parts[0].strip() if parts else ""
+    location = parts[-1].strip() if len(parts) >= 2 else ""
+    return dates, location
+
+
+def _parse_tools(text):
+    """Split a bullet-separated tools line into a list."""
+    return [t.strip() for t in re.split(r"\s*[·\xb7]\s*", text) if t.strip()]
+
+
+def _flush_experience(experiences, current_exp, current_sub):
+    if current_sub is not None and current_exp is not None:
+        current_exp.subprojects.append(current_sub)
+    if current_exp is not None:
+        experiences.append(current_exp)
+
+
+def parse_experiences(tokens):
+    """Parse Experience objects from a token list. Stops at first STANDALONE_TITLE."""
+    experiences = []
+    current_exp = None
+    current_sub = None
+    state = "IDLE"  # IDLE, IN_EXP, IN_SUB, IN_ACTION, IN_RESULT
+
+    for tok in tokens:
+        # --- boundaries that end the experience section ---
+        if tok.type in ("STANDALONE_TITLE", "SECTION_END"):
+            _flush_experience(experiences, current_exp, current_sub)
+            break
+
+        if tok.type == "UNKNOWN_HEADER":
+            # FireWarden, CWC etc — end current experience, skip entry
+            _flush_experience(experiences, current_exp, current_sub)
+            current_exp = None
+            current_sub = None
+            state = "IDLE"
+            continue
+
+        # --- new experience ---
+        if tok.type == "COMPANY_HEADER":
+            _flush_experience(experiences, current_exp, current_sub)
+            company, role = _parse_company_header(tok.text)
+            current_exp = Experience(company=company, role=role, dates="", location="", subprojects=[])
+            current_sub = None
+            state = "IN_EXP"
+            continue
+
+        if current_exp is None:
+            continue
+
+        # --- experience-level fields ---
+        if tok.type == "DATE_LINE" and state == "IN_EXP":
+            current_exp.dates, current_exp.location = _parse_date_line(tok.text)
+            continue
+
+        # --- named subproject header ---
+        if tok.type == "SUBPROJECT_HEADER":
+            if current_sub is not None:
+                current_exp.subprojects.append(current_sub)
+            title = re.sub(r"^Project \d+:\s*", "", tok.text).strip()
+            current_sub = SubProject(title=title, tools=[], situation="", task="", action=[], result=[])
+            state = "IN_SUB"
+            continue
+
+        # --- implicit subproject start (flat experience) ---
+        if current_sub is None and tok.type in ("TOOLS_LINE", "STAR_TABLE", "ACTION_HEADER"):
+            current_sub = SubProject(title="", tools=[], situation="", task="", action=[], result=[])
+            state = "IN_SUB"
+            # fall through to handle the token below
+
+        if current_sub is None:
+            continue
+
+        # --- subproject-level fields ---
+        if tok.type == "TOOLS_LINE":
+            current_sub.tools = _parse_tools(tok.text)
+        elif tok.type == "STAR_TABLE":
+            current_sub.situation = tok.situation
+            current_sub.task = tok.task
+        elif tok.type == "ACTION_HEADER":
+            state = "IN_ACTION"
+        elif tok.type == "RESULT_HEADER":
+            state = "IN_RESULT"
+        elif tok.type == "BULLET_ITEM" and state == "IN_ACTION":
+            current_sub.action.append(tok.text)
+        elif tok.type == "BULLET_ITEM" and state == "IN_RESULT":
+            current_sub.result.append(tok.text)
+
+    else:
+        # token list exhausted without hitting a boundary
+        _flush_experience(experiences, current_exp, current_sub)
+
+    return experiences
+
+
 DOCX_PATH = pathlib.Path(
     r"C:\Users\reeth\OneDrive - University of Southern California"
     r"\website\Reeth_Kawad_Master_Career_Doc_v2 (1).docx"

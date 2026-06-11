@@ -121,3 +121,77 @@ def test_tokenize_action_result_headers():
     types = [t.type for t in tokens]
     assert "ACTION_HEADER" in types
     assert "RESULT_HEADER" in types
+
+from update_site import parse_experiences
+
+def _make_flat_experience_tokens():
+    """Tokens for a single-subproject (flat star) experience."""
+    return [
+        Token(type="COMPANY_HEADER", text="TuTr Hyperloop — Mechanical Engineer Intern"),
+        Token(type="DATE_LINE", text="Jun 2024 – Jul 2024  |  Hyperloop chassis  |  LA, CA"),
+        Token(type="TOOLS_LINE", text="ANSYS · Siemens NX · Structural Analysis"),
+        Token(type="STAR_TABLE", situation="Pod was too heavy.", task="Reduce weight by 30%."),
+        Token(type="ACTION_HEADER"),
+        Token(type="BULLET_ITEM", text="Conducted 1D structural analysis."),
+        Token(type="RESULT_HEADER"),
+        Token(type="BULLET_ITEM", text="Achieved 30% weight reduction."),
+    ]
+
+def _make_multi_subproject_tokens():
+    """Tokens for an experience with two named subprojects."""
+    return [
+        Token(type="COMPANY_HEADER", text="Lumindt Labs — Mechanical Engineering Intern"),
+        Token(type="DATE_LINE", text="Jun 2025 – Aug 2025  |  Thermal startup  |  SF, CA"),
+        Token(type="SUBPROJECT_HEADER", text="Project 1: Hot-Wire System"),
+        Token(type="TOOLS_LINE", text="Python · Raspberry Pi · SolidWorks"),
+        Token(type="STAR_TABLE", situation="No measurement tool.", task="Build one."),
+        Token(type="ACTION_HEADER"),
+        Token(type="BULLET_ITEM", text="Built the sensor."),
+        Token(type="RESULT_HEADER"),
+        Token(type="BULLET_ITEM", text="10% uncertainty achieved."),
+        Token(type="SUBPROJECT_HEADER", text="Project 2: Structural Design"),
+        Token(type="TOOLS_LINE", text="SolidWorks Weldments · ASME"),
+        Token(type="STAR_TABLE", situation="Heavy frame.", task="Lighten it."),
+        Token(type="ACTION_HEADER"),
+        Token(type="BULLET_ITEM", text="Designed in weldments."),
+        Token(type="RESULT_HEADER"),
+        Token(type="BULLET_ITEM", text="Safety margins met."),
+    ]
+
+def test_parse_flat_experience():
+    tokens = _make_flat_experience_tokens()
+    exps = parse_experiences(tokens)
+    assert len(exps) == 1
+    exp = exps[0]
+    assert exp.company == "TuTr Hyperloop"
+    assert exp.role == "Mechanical Engineer Intern"
+    assert "Jun 2024" in exp.dates
+    assert "LA" in exp.location
+    assert len(exp.subprojects) == 1
+    sp = exp.subprojects[0]
+    assert sp.title == ""
+    assert sp.situation == "Pod was too heavy."
+    assert sp.task == "Reduce weight by 30%."
+    assert sp.action == ["Conducted 1D structural analysis."]
+    assert sp.result == ["Achieved 30% weight reduction."]
+
+def test_parse_multi_subproject_experience():
+    tokens = _make_multi_subproject_tokens()
+    exps = parse_experiences(tokens)
+    assert len(exps) == 1
+    exp = exps[0]
+    assert exp.company == "Lumindt Labs"
+    assert len(exp.subprojects) == 2
+    assert exp.subprojects[0].title == "Hot-Wire System"
+    assert exp.subprojects[1].title == "Structural Design"
+    assert exp.subprojects[0].action == ["Built the sensor."]
+    assert exp.subprojects[1].result == ["Safety margins met."]
+
+def test_parse_two_experiences():
+    tokens = _make_flat_experience_tokens() + _make_flat_experience_tokens()
+    tokens2 = list(tokens)
+    tokens2[len(_make_flat_experience_tokens())] = Token(
+        type="COMPANY_HEADER", text="National Institute of Wind Energy — Wind Blade Intern"
+    )
+    exps = parse_experiences(tokens2)
+    assert len(exps) == 2

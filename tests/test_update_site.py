@@ -196,6 +196,93 @@ def test_parse_two_experiences():
     exps = parse_experiences(tokens2)
     assert len(exps) == 2
 
+from update_site import extract_manual_experience_fields, extract_manual_project_fields
+
+_SAMPLE_EXP_JS = """
+const EXPERIENCE = [
+  {
+    slug: "tutr",
+    company: "TuTr Hyperloop",
+    logo: "",
+    role: "Intern",
+    dates: "Jun 2024",
+    location: "LA",
+    zone: "hardware",
+    bullets: [
+      "Optimized chassis weight."
+    ],
+    star: {
+      situation: "s",
+      task: "t",
+      action: ["a"],
+      result: ["r"]
+    }
+  },
+  {
+    slug: "graymatter",
+    company: "GrayMatter Robotics",
+    logo: "gm.jpg",
+    role: "Intern",
+    dates: "Jan 2026",
+    location: "Torrance",
+    zone: "robotics",
+    bullets: [
+      "Led fixture design.",
+      "Built DAQ."
+    ],
+    subprojects: [
+      {
+        title: "Fixture",
+        tools: ["SolidWorks"],
+        gallery: [],
+        star: { situation: "s", task: "t", action: [], result: [] }
+      }
+    ]
+  }
+];
+"""
+
+_SAMPLE_PROJ_JS = """
+const PROJECTS = [
+  {
+    slug: "vawt",
+    title: "VAWT",
+    zone: "cleantech",
+    thumb: "assets/vawt.jpg",
+    tags: [],
+    gallery: [],
+    star: { situation: "s", task: "t", action: [], result: [] }
+  },
+  {
+    slug: "drone",
+    title: "Drone",
+    zone: "hardware",
+    thumb: "assets/drone.png",
+    tags: [],
+    gallery: [],
+    star: { situation: "s", task: "t", action: [], result: [] }
+  }
+];
+"""
+
+def test_extract_manual_experience_fields():
+    fields = extract_manual_experience_fields(_SAMPLE_EXP_JS)
+    assert "tutr" in fields
+    assert fields["tutr"]["zone"] == "hardware"
+    assert fields["tutr"]["logo"] == ""
+    assert fields["tutr"]["bullets"] == ["Optimized chassis weight."]
+    assert "graymatter" in fields
+    assert fields["graymatter"]["logo"] == "gm.jpg"
+    assert fields["graymatter"]["bullets"] == ["Led fixture design.", "Built DAQ."]
+
+def test_extract_manual_project_fields():
+    fields = extract_manual_project_fields(_SAMPLE_PROJ_JS)
+    assert "vawt" in fields
+    assert fields["vawt"]["zone"] == "cleantech"
+    assert fields["vawt"]["thumb"] == "assets/vawt.jpg"
+    assert "drone" in fields
+    assert fields["drone"]["zone"] == "hardware"
+
 from update_site import parse_projects
 
 def _make_project_tokens():
@@ -245,3 +332,60 @@ def test_parse_project_strips_award_emoji():
     ]
     projects = parse_projects(tokens)
     assert projects[0].title == "Smart Alarm Clock"
+
+from update_site import render_experience_js, render_project_js
+
+def test_render_flat_experience_js():
+    exp = Experience(
+        company="TuTr Hyperloop", role="Intern",
+        dates="Jun 2024 – Jul 2024", location="LA, CA",
+        subprojects=[SubProject(
+            title="", tools=["ANSYS", "NX"],
+            situation="Pod was heavy.", task="Reduce weight.",
+            action=["Did analysis."], result=["30% lighter."]
+        )]
+    )
+    manual = {"slug": "tutr", "logo": "", "zone": "hardware", "bullets": ["Optimized weight."]}
+    js = render_experience_js(exp, manual)
+    assert 'slug: "tutr"' in js
+    assert 'zone: "hardware"' in js
+    assert '"Optimized weight."' in js
+    assert '"Pod was heavy."' in js
+    assert '"Did analysis."' in js
+    assert 'subprojects' not in js
+    assert 'star:' in js
+
+def test_render_multi_subproject_experience_js():
+    exp = Experience(
+        company="Lumindt Labs", role="ME Intern",
+        dates="Jun 2025 – Aug 2025", location="SF, CA",
+        subprojects=[
+            SubProject(title="Hot-Wire", tools=["Python"], situation="s1", task="t1",
+                       action=["a1"], result=["r1"]),
+            SubProject(title="Structural", tools=["SolidWorks"], situation="s2", task="t2",
+                       action=["a2"], result=["r2"]),
+        ]
+    )
+    manual = {"slug": "lumindt", "logo": "lum.jpg", "zone": "cleantech",
+              "bullets": ["Built system.", "Designed frame."]}
+    js = render_experience_js(exp, manual)
+    assert 'subprojects:' in js
+    assert '"Hot-Wire"' in js
+    assert '"Structural"' in js
+    assert 'gallery: []' in js
+    assert '"Python"' in js
+
+def test_render_project_js():
+    proj = Project(
+        title="Vertical Axis Wind Turbine", tags=["Wind Energy", "PID"],
+        situation="VAWTs inefficient.", task="Add pitch control.",
+        action=["Built it."], result=["8% improvement."]
+    )
+    manual = {"slug": "vawt", "zone": "cleantech", "thumb": "assets/vawt.jpg"}
+    js = render_project_js(proj, manual)
+    assert 'slug: "vawt"' in js
+    assert 'zone: "cleantech"' in js
+    assert 'thumb: "assets/vawt.jpg"' in js
+    assert '"Wind Energy"' in js
+    assert '"VAWTs inefficient."' in js
+    assert 'gallery: []' in js

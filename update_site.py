@@ -285,6 +285,151 @@ def parse_projects(tokens):
     return projects
 
 
+def _extract_top_level_entries(js_text):
+    """Yield the text content of each top-level { } entry in a JS array."""
+    depth = 0
+    start = None
+    for i, ch in enumerate(js_text):
+        if ch == '{':
+            if depth == 0:
+                start = i + 1
+            depth += 1
+        elif ch == '}':
+            depth -= 1
+            if depth == 0 and start is not None:
+                yield js_text[start:i]
+                start = None
+
+
+def extract_manual_experience_fields(js_text):
+    """Parse manual-only fields (slug, logo, zone, bullets) from EXPERIENCE JS array.
+
+    Returns a dict keyed by slug:
+      { slug: { "slug": ..., "logo": ..., "zone": ..., "bullets": [...] } }
+    """
+    result = {}
+    for block in _extract_top_level_entries(js_text):
+        slug_m = re.search(r'slug:\s*"([^"]*)"', block)
+        if not slug_m:
+            continue
+        slug = slug_m.group(1)
+        logo_m = re.search(r'logo:\s*"([^"]*)"', block)
+        zone_m = re.search(r'zone:\s*"([^"]*)"', block)
+        bullets_m = re.search(r'bullets:\s*\[(.*?)\]', block, re.DOTALL)
+        logo = logo_m.group(1) if logo_m else ""
+        zone = zone_m.group(1) if zone_m else ""
+        bullets = []
+        if bullets_m:
+            bullets = re.findall(r'"([^"]*)"', bullets_m.group(1))
+        result[slug] = {"slug": slug, "logo": logo, "zone": zone, "bullets": bullets}
+    return result
+
+
+def extract_manual_project_fields(js_text):
+    """Parse manual-only fields (slug, zone, thumb) from PROJECTS JS array.
+
+    Returns a dict keyed by slug:
+      { slug: { "slug": ..., "zone": ..., "thumb": ... } }
+    """
+    result = {}
+    for block in _extract_top_level_entries(js_text):
+        slug_m = re.search(r'slug:\s*"([^"]*)"', block)
+        if not slug_m:
+            continue
+        slug = slug_m.group(1)
+        zone_m = re.search(r'zone:\s*"([^"]*)"', block)
+        thumb_m = re.search(r'thumb:\s*"([^"]*)"', block)
+        zone = zone_m.group(1) if zone_m else ""
+        thumb = thumb_m.group(1) if thumb_m else ""
+        result[slug] = {"slug": slug, "zone": zone, "thumb": thumb}
+    return result
+
+
+def _js_str_array(items, indent):
+    """Render a JS string array with given indentation for items."""
+    if not items:
+        return "[]"
+    lines = ",\n".join(f'{indent}"{js_escape(i)}"' for i in items)
+    return f"[\n{lines}\n{indent[:-2]}]"
+
+
+def _render_star(sp, base_indent):
+    """Render a star: {...} block. base_indent is the indent of 'star:'."""
+    i2 = base_indent + "  "
+    i3 = i2 + "  "
+    return (
+        f"star: {{\n"
+        f'{i2}situation: "{js_escape(sp.situation)}",\n'
+        f'{i2}task: "{js_escape(sp.task)}",\n'
+        f"{i2}action: {_js_str_array(sp.action, i3)},\n"
+        f"{i2}result: {_js_str_array(sp.result, i3)}\n"
+        f"{base_indent}}}"
+    )
+
+
+def render_experience_js(exp, manual):
+    """Render a single JS experience entry object (no trailing comma)."""
+    slug = manual.get("slug", "TODO_slug")
+    logo = js_escape(manual.get("logo", ""))
+    zone = manual.get("zone", "")
+    bullets = manual.get("bullets", [])
+
+    bullets_js = _js_str_array(bullets, "      ")
+    header = (
+        f'  {{\n'
+        f'    slug: "{slug}",\n'
+        f'    company: "{js_escape(exp.company)}",\n'
+        f'    logo: "{logo}",\n'
+        f'    role: "{js_escape(exp.role)}",\n'
+        f'    dates: "{js_escape(exp.dates)}",\n'
+        f'    location: "{js_escape(exp.location)}",\n'
+        f'    zone: "{zone}",\n'
+        f'    bullets: {bullets_js},\n'
+    )
+
+    if len(exp.subprojects) == 1 and exp.subprojects[0].title == "":
+        # flat star layout
+        sp = exp.subprojects[0]
+        star_block = _render_star(sp, "    ")
+        return header + f"    {star_block}\n  }}"
+    else:
+        # subprojects layout
+        sub_parts = []
+        for sp in exp.subprojects:
+            tools_js = _js_str_array(sp.tools, "          ")
+            star_block = _render_star(sp, "        ")
+            sub_parts.append(
+                f'      {{\n'
+                f'        title: "{js_escape(sp.title)}",\n'
+                f'        tools: {tools_js},\n'
+                f'        gallery: [],\n'
+                f'        {star_block}\n'
+                f'      }}'
+            )
+        subs_js = ",\n".join(sub_parts)
+        return header + f"    subprojects: [\n{subs_js}\n    ]\n  }}"
+
+
+def render_project_js(proj, manual):
+    """Render a single JS project entry object (no trailing comma)."""
+    slug = manual.get("slug", "TODO_slug")
+    zone = manual.get("zone", "")
+    thumb = js_escape(manual.get("thumb", ""))
+    tags_js = _js_str_array(proj.tags, "      ")
+    star_block = _render_star(proj, "    ")
+    return (
+        f'  {{\n'
+        f'    slug: "{slug}",\n'
+        f'    title: "{js_escape(proj.title)}",\n'
+        f'    zone: "{zone}",\n'
+        f'    thumb: "{thumb}",\n'
+        f'    tags: {tags_js},\n'
+        f'    gallery: [],\n'
+        f'    {star_block}\n'
+        f'  }}'
+    )
+
+
 DOCX_PATH = pathlib.Path(
     r"C:\Users\reeth\OneDrive - University of Southern California"
     r"\website\Reeth_Kawad_Master_Career_Doc_v2 (1).docx"

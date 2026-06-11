@@ -17,3 +17,25 @@ def test_project_defaults():
 def test_token_defaults():
     tok = Token(type="BULLET_ITEM", text="hello")
     assert tok.situation == ""
+
+from docx import Document
+from update_site import iter_body_elements
+
+def test_iter_body_elements_order():
+    doc = Document()
+    doc.add_paragraph("first")
+    doc.add_table(rows=1, cols=1)
+    doc.add_paragraph("third")
+    elements = list(iter_body_elements(doc))
+    kinds = [k for k, _ in elements]
+    # new Document() starts with one empty paragraph, then we add: para, table, para
+    assert kinds.count("table") == 1
+    table_idx = kinds.index("table")
+    assert "paragraph" in kinds[:table_idx]
+    assert "paragraph" in kinds[table_idx+1:]
+
+def test_iter_body_elements_empty_doc():
+    doc = Document()
+    # new Document() has one empty paragraph by default
+    elements = list(iter_body_elements(doc))
+    assert all(k == "paragraph" for k, _ in elements)

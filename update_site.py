@@ -24,6 +24,9 @@ try:
 except ImportError:
     sys.exit("Run: pip install python-docx")
 
+from docx.oxml.ns import qn
+from docx.text.paragraph import Paragraph as DocxParagraph
+from docx.table import Table as DocxTable
 from dataclasses import dataclass, field
 from typing import List
 
@@ -63,6 +66,17 @@ class Token:
     text: str = ""
     situation: str = ""
     task: str = ""
+
+
+def iter_body_elements(doc):
+    """Yield (kind, element) for each paragraph or table in document order."""
+    for child in doc.element.body.iterchildren():
+        tag = child.tag.split("}")[-1]
+        if tag == "p":
+            yield "paragraph", DocxParagraph(child, doc)
+        elif tag == "tbl":
+            yield "table", DocxTable(child, doc)
+
 
 DOCX_PATH = pathlib.Path(
     r"C:\Users\reeth\OneDrive - University of Southern California"

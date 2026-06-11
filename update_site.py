@@ -78,6 +78,20 @@ def iter_body_elements(doc):
             yield "table", DocxTable(child, doc)
 
 
+def parse_star_table(table):
+    """Extract (situation, task) from a 2-row S/T table. Returns (None, None) if not a STAR table."""
+    if len(table.rows) < 2:
+        return None, None
+    row0, row1 = table.rows[0], table.rows[1]
+    if len(row0.cells) < 2 or len(row1.cells) < 2:
+        return None, None
+    if row0.cells[0].text.strip() != "S" or row1.cells[0].text.strip() != "T":
+        return None, None
+    situation = re.sub(r"^SITUATION\s*", "", row0.cells[1].text.strip(), flags=re.IGNORECASE).strip()
+    task = re.sub(r"^TASK\s*", "", row1.cells[1].text.strip(), flags=re.IGNORECASE).strip()
+    return situation, task
+
+
 DOCX_PATH = pathlib.Path(
     r"C:\Users\reeth\OneDrive - University of Southern California"
     r"\website\Reeth_Kawad_Master_Career_Doc_v2 (1).docx"

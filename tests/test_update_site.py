@@ -39,3 +39,42 @@ def test_iter_body_elements_empty_doc():
     # new Document() has one empty paragraph by default
     elements = list(iter_body_elements(doc))
     assert all(k == "paragraph" for k, _ in elements)
+
+from update_site import parse_star_table
+
+def _make_star_table(doc, situation, task):
+    table = doc.add_table(rows=2, cols=2)
+    table.rows[0].cells[0].text = "S"
+    table.rows[0].cells[1].text = f"SITUATION  {situation}"
+    table.rows[1].cells[0].text = "T"
+    table.rows[1].cells[1].text = f"TASK  {task}"
+    return table
+
+def test_parse_star_table_extracts_fields():
+    doc = Document()
+    table = _make_star_table(doc, "The initial problem.", "Fix it completely.")
+    situation, task = parse_star_table(table)
+    assert situation == "The initial problem."
+    assert task == "Fix it completely."
+
+def test_parse_star_table_strips_prefix():
+    doc = Document()
+    table = doc.add_table(rows=2, cols=2)
+    table.rows[0].cells[0].text = "S"
+    table.rows[0].cells[1].text = "SITUATION No prefix needed."
+    table.rows[1].cells[0].text = "T"
+    table.rows[1].cells[1].text = "TASK Do the thing."
+    situation, task = parse_star_table(table)
+    assert not situation.startswith("SITUATION")
+    assert not task.startswith("TASK")
+
+def test_parse_star_table_wrong_labels_returns_none():
+    doc = Document()
+    table = doc.add_table(rows=2, cols=2)
+    table.rows[0].cells[0].text = "X"
+    table.rows[0].cells[1].text = "Something"
+    table.rows[1].cells[0].text = "Y"
+    table.rows[1].cells[1].text = "Other"
+    situation, task = parse_star_table(table)
+    assert situation is None
+    assert task is None

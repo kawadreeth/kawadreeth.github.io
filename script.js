@@ -123,11 +123,12 @@ async function renderAbout() {
 // Number of most-recent year groups expanded by default.
 const OPEN_YEARS = 2;
 
-function slidesLink(p) {
-  const slides = (p.links || []).find(l => /slides?/i.test(l.label));
-  return slides
-    ? `<a class="card-slides" href="${slides.url}" target="_blank" rel="noopener">Slides ↗</a>`
-    : '';
+function cardLinks(p) {
+  const links = p.links || [];
+  if (!links.length) return '';
+  return `<div class="card-links">${links
+    .map(l => `<a class="card-pill" href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.label)} ↗</a>`)
+    .join('')}</div>`;
 }
 
 function projectCardHTML(p) {
@@ -142,7 +143,7 @@ function projectCardHTML(p) {
         </div>
       </div>
     </a>
-    ${slidesLink(p)}
+    ${cardLinks(p)}
   `;
 }
 

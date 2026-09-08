@@ -196,6 +196,7 @@ const PROJECTS = [
   {
     slug: "thermofluids",
     year: 2026,
+    links: [{ label: "Github", url: "https://github.com/reethkawad/ThermoFluids-Projects" }],
     title: "Thermofluids Sandbox",
     zone: "cleantech",
     thumb: "assets/projects/thermofluids/coolingplate_viz.jpg",
@@ -372,6 +373,7 @@ const PROJECTS = [
   {
     slug: "waterrocket",
     year: 2024,
+    links: [{ label: "Github", url: "https://github.com/reethkawad/Water-rocket" }],
     title: "Water Rocket Flight Optimisation",
     zone: "hardware",
     thumb: "assets/projects/waterrocket/thumb.JPG",

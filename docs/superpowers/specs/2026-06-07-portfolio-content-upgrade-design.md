@@ -1,6 +1,6 @@
 # Portfolio Content Upgrade — Design Spec
 **Date:** 2026-06-07
-**Scope:** Full content refresh of `kawadreeth.github.io` — richer detail pages, auto-gallery, skills restructure, NIWE/FireWarden/CWC entries, resume download, and a doc-to-site update script.
+**Scope:** Full content refresh of `reethkawad.github.io` — richer detail pages, auto-gallery, skills restructure, NIWE/FireWarden/CWC entries, resume download, and a doc-to-site update script.
 
 ---
 

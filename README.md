@@ -1,4 +1,4 @@
-# kawadreeth.github.io
+# reethkawad.github.io
 
 Personal portfolio — static GitHub Pages site, no build pipeline.
 

@@ -11,9 +11,9 @@ const ABOUT = {
     "I'm actively looking for roles in robotics, clean energy, industrial automation, and hardware-focused engineering — wherever rigorous first-principles thinking and hands-on experimentation create real-world impact."
   ],
   photo: "assets/profile_picture.png",
-  email: "reethkawad@gmail.co",
+  email: "reethkawad@gmail.com",
   linkedin: "https://www.linkedin.com/in/reethkawad/",
-  github: "https://github.com/kawadreeth",
+  github: "https://github.com/reethkawad",
   resume: "assets/Reeth_Kawad_CV.pdf"
 };
 

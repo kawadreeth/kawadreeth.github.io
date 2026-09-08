@@ -1,6 +1,6 @@
 # Portfolio Visual Upgrade — Design Spec
 **Date:** 2026-04-18
-**Scope:** Three visual upgrades to `kawadreeth.github.io` — hero photo, experience timeline, project drawer expansion.
+**Scope:** Three visual upgrades to `reethkawad.github.io` — hero photo, experience timeline, project drawer expansion.
 
 ---
 

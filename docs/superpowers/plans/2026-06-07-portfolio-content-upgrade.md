@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Upgrade kawadreeth.github.io with STAR detail pages, subproject experience cards, 11-category skills, NIWE/FireWarden/CWC entries, resume download, and a `python update_site.py` command that syncs text from the career doc.
+**Goal:** Upgrade reethkawad.github.io with STAR detail pages, subproject experience cards, 11-category skills, NIWE/FireWarden/CWC entries, resume download, and a `python update_site.py` command that syncs text from the career doc.
 
 **Architecture:** Single-source data in `data/site-data.js` feeds all pages via `script.js` render functions. `projects/project.html` and `experience/experience.html` are shared templates loaded via `?slug=` query params. Main-page card styles live in `style.css`; detail-page styles in `projects/project-page.css`.
 

@@ -666,4 +666,4 @@ Open `index.html` in browser and verify all three features together:
 git push origin main
 ```
 
-GitHub Pages will update within ~60 seconds at `https://kawadreeth.github.io`.
+GitHub Pages will update within ~60 seconds at `https://reethkawad.github.io`.

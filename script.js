@@ -72,6 +72,19 @@ function getQuerySlug() {
   return new URLSearchParams(window.location.search).get('slug') || '';
 }
 
+// Detail pages (projects/, experience/) live one level below the site root;
+// index.html is at the root. Data stores asset paths root-relative, so prefix
+// them with ../ when we're on a detail page.
+const ASSET_PREFIX = (typeof document !== 'undefined' && document.querySelector('[data-page-type]')) ? '../' : '';
+function assetUrl(s) {
+  return (s && !/^(?:[a-z]+:|\/|\.\.\/)/i.test(s)) ? ASSET_PREFIX + s : s;
+}
+
+function paragraphsHTML(value) {
+  const parts = Array.isArray(value) ? value : [value];
+  return parts.filter(Boolean).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+}
+
 function parseAboutBio(text) {
   const startMarker = 'Short Bio (Portfolio About Page / LinkedIn Summary)';
   const endMarker = 'HOW TO USE THIS DOCUMENT';
@@ -107,21 +120,20 @@ async function renderAbout() {
 }
 
 // ── Render: Projects ─────────────────────────────────────────
-function renderProjects() {
-  const grid = document.getElementById('projects-grid');
-  if (!grid || typeof PROJECTS === 'undefined') return;
-  grid.innerHTML = '';
+// Number of most-recent year groups expanded by default.
+const OPEN_YEARS = 2;
 
-  PROJECTS.forEach(p => {
-    const link = document.createElement('a');
-    link.href = `projects/project.html?slug=${encodeURIComponent(p.slug)}`;
-    link.className = `project-card ${zoneClass(p.zone)}`;
-    link.dataset.zone = p.zone;
-    link.setAttribute('role', 'listitem');
-    link.setAttribute('aria-label', p.title);
+function slidesLink(p) {
+  const slides = (p.links || []).find(l => /slides?/i.test(l.label));
+  return slides
+    ? `<a class="card-slides" href="${slides.url}" target="_blank" rel="noopener">Slides ↗</a>`
+    : '';
+}
 
-    link.innerHTML = `
-      <img class="card-image" src="${p.thumb || ''}" alt="${escapeHtml(p.title)}" loading="lazy" />
+function projectCardHTML(p) {
+  return `
+    <a class="card-link" href="projects/project.html?slug=${encodeURIComponent(p.slug)}" aria-label="${escapeHtml(p.title)}">
+      ${p.thumb ? `<img class="card-image" src="${assetUrl(p.thumb)}" alt="${escapeHtml(p.title)}" loading="lazy" />` : ''}
       <div class="card-body">
         <span class="zone-badge ${zoneClass(p.zone)}">${zoneLabel(p.zone)}</span>
         <h3 class="card-title">${escapeHtml(p.title)}</h3>
@@ -129,10 +141,112 @@ function renderProjects() {
           ${(p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
         </div>
       </div>
+    </a>
+    ${slidesLink(p)}
+  `;
+}
+
+function renderProjects() {
+  const grid = document.getElementById('projects-grid');
+  if (!grid || typeof PROJECTS === 'undefined') return;
+  grid.innerHTML = '';
+
+  // Group by year, descending. Entries without a year sort last under "Undated".
+  const sorted = [...PROJECTS].sort((a, b) => (b.year || 0) - (a.year || 0));
+  const groups = new Map();
+  sorted.forEach(p => {
+    const key = p.year || 'Undated';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(p);
+  });
+
+  let index = 0;
+  groups.forEach((projects, key) => {
+    const open = index < OPEN_YEARS;
+    index++;
+
+    const section = document.createElement('div');
+    section.className = 'timeline-year';
+    section.dataset.year = key;
+
+    const label = key === 'Undated' ? 'Undated' : key;
+    const count = `${projects.length} project${projects.length === 1 ? '' : 's'}`;
+
+    section.innerHTML = `
+      <button class="year-toggle" aria-expanded="${open ? 'true' : 'false'}">
+        <span class="year-node" aria-hidden="true"></span>
+        <span class="year-label">${escapeHtml(String(label))}</span>
+        <span class="year-count">${count}</span>
+        <span class="year-chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="year-projects" role="list"${open ? '' : ' hidden'}></div>
     `;
 
-    grid.appendChild(link);
+    const listEl = section.querySelector('.year-projects');
+    projects.forEach(p => {
+      const card = document.createElement('div');
+      card.className = `project-card ${zoneClass(p.zone)}`;
+      card.dataset.zone = p.zone;
+      card.dataset.year = key;
+      card.setAttribute('role', 'listitem');
+      card.innerHTML = projectCardHTML(p);
+      listEl.appendChild(card);
+    });
+
+    grid.appendChild(section);
   });
+}
+
+function toggleYear(btn) {
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  const list = btn.parentElement.querySelector('.year-projects');
+  if (list) list.hidden = expanded;
+}
+
+function starHTML(star) {
+  if (!star) return '';
+  return `
+    <div class="star-sections">
+      <div class="star-section">
+        <div class="star-label">Situation</div>
+        <p>${escapeHtml(star.situation || '')}</p>
+      </div>
+      <div class="star-section">
+        <div class="star-label">Task</div>
+        <p>${escapeHtml(star.task || '')}</p>
+      </div>
+      <div class="star-section">
+        <div class="star-label">Action</div>
+        <ul class="detail-list">${(star.action || []).map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>
+      </div>
+      <div class="star-section">
+        <div class="star-label">Results</div>
+        <ul class="detail-list detail-list--result">${(star.result || []).map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+}
+
+function subprojectsHTML(subprojects) {
+  return (subprojects || []).map(sp => `
+    <details class="subproject" open>
+      <summary class="subproject-header">
+        <span class="subproject-title">${escapeHtml(sp.title)}</span>
+        <div class="subproject-tools">
+          ${(sp.tools || []).map(t => `<span class="tag tag--small">${escapeHtml(t)}</span>`).join('')}
+        </div>
+      </summary>
+      <div class="subproject-body">
+        ${sp.star
+          ? starHTML(sp.star)
+          : `${sp.summary ? `<p>${escapeHtml(sp.summary)}</p>` : ''}${(sp.points || []).length ? `<ul class="detail-list">${sp.points.map(pt => `<li>${escapeHtml(pt)}</li>`).join('')}</ul>` : ''}`}
+        ${sp.gallery?.length ? `
+          <div class="project-gallery" style="margin-top:1rem;">
+            ${sp.gallery.map(src => `<figure class="project-figure"><img src="${assetUrl(src)}" alt="${escapeHtml(sp.title)}" loading="lazy" onerror="this.closest('figure').style.display='none'" /></figure>`).join('')}
+          </div>` : ''}
+      </div>
+    </details>
+  `).join('');
 }
 
 function renderProjectDetail() {
@@ -148,28 +262,49 @@ function renderProjectDetail() {
   page.querySelector('[data-project-title]').textContent = project.title;
 
   const heroImg = page.querySelector('[data-project-hero]');
-  const heroSrc = project.gallery?.[0] || project.thumb || '';
-  if (heroImg && heroSrc) { heroImg.src = heroSrc; heroImg.alt = project.title; }
+  const heroSrc = assetUrl(project.gallery?.[0] || project.thumb || '');
+  if (heroImg && heroSrc) {
+    heroImg.alt = project.title;
+    heroImg.onerror = () => { heroImg.style.display = 'none'; };
+    heroImg.src = heroSrc;
+    heroImg.style.display = '';
+  } else if (heroImg) { heroImg.style.display = 'none'; }
 
+  const starBox = page.querySelector('[data-project-star]');
   const star = project.star;
-  if (star) {
+  if (project.overview) {
+    // Simple (non-STAR) mode: plain prose in place of the STAR grid.
+    starBox.classList.remove('star-sections');
+    starBox.innerHTML = paragraphsHTML(project.overview);
+  } else if (star) {
     page.querySelector('[data-project-situation]').textContent = star.situation || '';
     page.querySelector('[data-project-task]').textContent = star.task || '';
-    page.querySelector('[data-project-action]').innerHTML =
-      (star.action || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
-    page.querySelector('[data-project-result]').innerHTML =
-      (star.result || []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
+    const actionEl = page.querySelector('[data-project-action]');
+    const resultEl = page.querySelector('[data-project-result]');
+    actionEl.innerHTML = (star.action || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
+    resultEl.innerHTML = (star.result || []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
+    actionEl.closest('.star-section').style.display = (star.action || []).length ? '' : 'none';
+    resultEl.closest('.star-section').style.display = (star.result || []).length ? '' : 'none';
   }
 
   const tags = page.querySelector('[data-project-tags]');
   if (tags) tags.innerHTML = (project.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
 
+  const subSection = page.querySelector('[data-project-subprojects-section]');
+  const subWrap = page.querySelector('[data-project-subprojects]');
+  if (subWrap && project.subprojects?.length) {
+    subWrap.innerHTML = subprojectsHTML(project.subprojects);
+    if (subSection) subSection.hidden = false;
+  } else if (subSection) {
+    subSection.hidden = true;
+  }
+
   const gallery = page.querySelector('[data-project-gallery]');
   if (gallery) {
     const images = [...new Set([project.thumb, ...(project.gallery || [])].filter(Boolean))];
     gallery.innerHTML = images.length
-      ? images.map(src => `<figure class="project-figure"><img src="${src}" alt="${escapeHtml(project.title)}" loading="lazy" /></figure>`).join('')
-      : '<p class="project-empty">No gallery images yet — add image paths to the <code>gallery</code> array in <code>data/site-data.js</code>.</p>';
+      ? images.map(src => `<figure class="project-figure"><img src="${assetUrl(src)}" alt="${escapeHtml(project.title)}" loading="lazy" onerror="this.closest('figure').style.display='none'" /></figure>`).join('')
+      : '';
   }
 
   const links = page.querySelector('[data-project-links]');
@@ -201,6 +336,12 @@ function applyFilter(zone) {
   document.querySelectorAll('.project-card').forEach(card => {
     card.classList.toggle('hidden', zone !== 'all' && card.dataset.zone !== zone);
   });
+
+  // Hide year groups that have no visible cards under the current filter
+  document.querySelectorAll('.timeline-year').forEach(section => {
+    const visible = section.querySelectorAll('.project-card:not(.hidden)').length;
+    section.classList.toggle('hidden', visible === 0);
+  });
 }
 
 // ── Render: Experience ───────────────────────────────────────
@@ -226,7 +367,7 @@ function renderExperience() {
         <div class="exp-dot ${zoneClass(e.zone)}"></div>
         <div class="exp-card ${zoneClass(e.zone)}">
           <div class="exp-header">
-            ${e.logo ? `<img src="${e.logo}" alt="${escapeHtml(e.company)}" class="exp-logo" />` : ''}
+            ${e.logo ? `<img src="${assetUrl(e.logo)}" alt="${escapeHtml(e.company)}" class="exp-logo" />` : ''}
             <div class="exp-left">
               <span class="exp-company">${escapeHtml(e.company)}</span>
               <span class="exp-role">${escapeHtml(e.role)}</span>
@@ -262,53 +403,18 @@ function renderExperienceDetail() {
   page.querySelector('[data-experience-location]').textContent = exp.location;
 
   const logo = page.querySelector('[data-experience-logo]');
-  if (logo && exp.logo) { logo.src = exp.logo; logo.alt = exp.company; }
-  else if (logo) { logo.style.display = 'none'; }
+  if (logo && exp.logo) {
+    logo.alt = exp.company;
+    logo.onerror = () => { logo.style.display = 'none'; };
+    logo.src = assetUrl(exp.logo);
+    logo.style.display = '';
+  } else if (logo) { logo.style.display = 'none'; }
 
   const body = page.querySelector('[data-experience-body]');
   if (!body) return;
 
-  function starHTML(star) {
-    if (!star) return '';
-    return `
-      <div class="star-sections">
-        <div class="star-section">
-          <div class="star-label">Situation</div>
-          <p>${escapeHtml(star.situation || '')}</p>
-        </div>
-        <div class="star-section">
-          <div class="star-label">Task</div>
-          <p>${escapeHtml(star.task || '')}</p>
-        </div>
-        <div class="star-section">
-          <div class="star-label">Action</div>
-          <ul class="detail-list">${(star.action || []).map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>
-        </div>
-        <div class="star-section">
-          <div class="star-label">Results</div>
-          <ul class="detail-list detail-list--result">${(star.result || []).map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
-        </div>
-      </div>`;
-  }
-
   if (exp.subprojects?.length) {
-    body.innerHTML = exp.subprojects.map(sp => `
-      <details class="subproject" open>
-        <summary class="subproject-header">
-          <span class="subproject-title">${escapeHtml(sp.title)}</span>
-          <div class="subproject-tools">
-            ${(sp.tools || []).map(t => `<span class="tag tag--small">${escapeHtml(t)}</span>`).join('')}
-          </div>
-        </summary>
-        <div class="subproject-body">
-          ${starHTML(sp.star)}
-          ${sp.gallery?.length ? `
-            <div class="project-gallery" style="margin-top:1rem;">
-              ${sp.gallery.map(src => `<figure class="project-figure"><img src="${src}" alt="${escapeHtml(sp.title)}" loading="lazy" /></figure>`).join('')}
-            </div>` : ''}
-        </div>
-      </details>
-    `).join('');
+    body.innerHTML = subprojectsHTML(exp.subprojects);
   } else {
     body.innerHTML = starHTML(exp.star)
       || `<ul class="detail-list">${(exp.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`;
@@ -340,6 +446,15 @@ function bindEvents() {
   document.querySelectorAll('.filter-tab').forEach(btn => {
     btn.addEventListener('click', () => applyFilter(btn.dataset.filter));
   });
+
+  // Timeline year collapse/expand (delegated — cards are re-rendered)
+  const grid = document.getElementById('projects-grid');
+  if (grid) {
+    grid.addEventListener('click', e => {
+      const toggle = e.target.closest('.year-toggle');
+      if (toggle) toggleYear(toggle);
+    });
+  }
 
   // Zone portals (hero)
   document.querySelectorAll('.zone-portal').forEach(btn => {
